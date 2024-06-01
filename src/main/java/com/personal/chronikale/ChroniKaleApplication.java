@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.github.javafaker.Faker;
 import com.personal.chronikale.entity.BlogUser;
@@ -22,7 +24,10 @@ public class ChroniKaleApplication {
 		SpringApplication.run(ChroniKaleApplication.class, args);
 	}
 	
-
+	@Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 	@Bean
 	CommandLineRunner runner(UserRepository userRepository) {
 		Faker fake= new Faker();
@@ -33,7 +38,8 @@ public class ChroniKaleApplication {
 		String aboutMe= "My name is "+name+", I am a Developer";
 		
 		return args->{
-			BlogUser blogUser=new BlogUser(name, email, phoneNumber, password, aboutMe);
+			BlogUser blogUser=new BlogUser(name, email, phoneNumber,
+					password, aboutMe);
 			List<BlogUser> userInfo= List.of(blogUser);
 			userRepository.saveAll(userInfo);
 		};

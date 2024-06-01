@@ -45,8 +45,9 @@ private UserRepository repository;
 	}
 
 	@Override
-	public void insertUser(BlogUser blogUser) {
+	public Boolean insertUser(BlogUser blogUser, String email) {
 		repository.save(blogUser);
+		return repository.existsByEmail(email);
 		// TODO Auto-generated method stub
 		
 	}
@@ -56,6 +57,12 @@ private UserRepository repository;
 		repository.save(blogUser);
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Boolean existsUserById(Integer user_id) {
+		
+		return repository.existsById(user_id);
 	}
 
 }
