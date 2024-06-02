@@ -34,7 +34,7 @@ public class ChroniKaleApplication {
 		String name= fake.name().name();
 		String email= fake.internet().safeEmailAddress();
 		String phoneNumber= fake.phoneNumber().phoneNumber();
-		String password= "MyUser@1";
+		String password= "MyUser@11";
 		String aboutMe= "My name is "+name+", I am a Developer";
 		
 		return args->{

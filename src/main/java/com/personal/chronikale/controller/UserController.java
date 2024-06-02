@@ -22,6 +22,8 @@ import com.personal.chronikale.Recorder.UserUpdateRequest;
 import com.personal.chronikale.responsePayload.ApplicationResponsePayload;
 import com.personal.chronikale.service.BlogUserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/v1/blog-user")
@@ -48,7 +50,7 @@ public ResponseEntity<UserResponsePayload> userDetailsById(
 }
 
 @PostMapping("/user-registration")
-public ResponseEntity<String> registerUser(
+public ResponseEntity<String> registerUser(@Valid
 		@RequestBody UserRegistrationRequest userRegistrationRequest
 		){
 	String bloguserRegistration= blogUserService
@@ -60,6 +62,7 @@ public ResponseEntity<String> registerUser(
 }
 @PutMapping("/user-update")
 public ResponseEntity<ApplicationResponsePayload> updateRequest(
+		@Valid
 		@RequestBody UserUpdateRequest userUpdateRequest,
 		@RequestParam Integer userid
 		)

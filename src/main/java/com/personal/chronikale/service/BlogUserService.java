@@ -132,7 +132,7 @@ public class BlogUserService {
 			change = true;
 		}
 		
-		if(!change) {
+		if(change == false) {
 			throw new RequestValidationExecption("No changes Reflected ");
 		}
 		userDAO.updateUser(userById);
