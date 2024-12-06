@@ -9,12 +9,38 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: mailsender.testid@gmail.com
+#    password: qkklqnlsaobewvfp
+#    protocol: smtp
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+##          connectiontimeout: 5000
+##          timeout: 3000
+##          writetimeout: 5000
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: 208711317242-o6q0k2tvldgr8s9q9o7a4e8h3iu77lmi.apps.googleusercontent.com 
+#            client-secret: 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
+#            scope: 
+#              - email
+#              - profile
+#            client-name: Google
 
   main:
     web-application-type: servlet

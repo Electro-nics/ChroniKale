@@ -24,26 +24,28 @@ public class ChroniKaleApplication {
 		SpringApplication.run(ChroniKaleApplication.class, args);
 	}
 	
+
+	
 	@Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	@Bean
-	CommandLineRunner runner(UserRepository userRepository) {
-		Faker fake= new Faker();
-		String name= fake.name().name();
-		String email= fake.internet().safeEmailAddress();
-		String phoneNumber= fake.phoneNumber().phoneNumber();
-		String password= "MyUser@11";
-		String aboutMe= "My name is "+name+", I am a Developer";
-		
-		return args->{
-			BlogUser blogUser=new BlogUser(name, email, phoneNumber,
-					password, aboutMe);
-			List<BlogUser> userInfo= List.of(blogUser);
-			userRepository.saveAll(userInfo);
-		};
-				}
+//	@Bean
+//	CommandLineRunner runner(UserRepository userRepository) {
+//		Faker fake= new Faker();
+//		String name= fake.name().name();
+//		String email= fake.internet().safeEmailAddress();
+//		String phoneNumber= fake.phoneNumber().phoneNumber();
+//		String password= "MyUser@11";
+//		String aboutMe= "My name is "+name+", I am a Developer";
+//		
+//		return args->{
+//			BlogUser blogUser=new BlogUser(name, email, phoneNumber,
+//					password, aboutMe);
+//			List<BlogUser> userInfo= List.of(blogUser);
+//			userRepository.saveAll(userInfo);
+//		};
+//				}
 	
 
 }
