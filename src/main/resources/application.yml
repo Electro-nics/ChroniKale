@@ -19,7 +19,7 @@ spring:
 #    host: smtp.gmail.com
 #    port: 587
 #    username: mailsender.testid@gmail.com
-#    password: qkklqnlsaobewvfp
+#    password: ${ENCODED_PASSWORD}
 #    protocol: smtp
 #    properties:
 #      mail:
@@ -35,8 +35,8 @@ spring:
 #      client:
 #        registration:
 #          google:
-#            client-id: 208711317242-o6q0k2tvldgr8s9q9o7a4e8h3iu77lmi.apps.googleusercontent.com 
-#            client-secret: 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
+#            client-id: ${GOOGLE_CLIENT_ID} 
+#            client-secret: ${GOOGLE_CLIENT_SECRET}
 #            scope: 
 #              - email
 #              - profile
