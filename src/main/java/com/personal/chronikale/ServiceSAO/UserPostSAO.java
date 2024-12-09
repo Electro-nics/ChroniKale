@@ -3,6 +3,7 @@ package com.personal.chronikale.ServiceSAO;
 import java.util.List;
 
 import com.personal.chronikale.Recorder.PostCreationRequest;
+import com.personal.chronikale.Recorder.UserPostResponse;
 import com.personal.chronikale.entity.BlogPost;
 import com.personal.chronikale.entity.BlogUser;
 
@@ -14,20 +15,20 @@ public interface UserPostSAO {
 	// Delete Post
 	void deletePost(Integer postId);
 	// get all post
-	List<BlogPost> getAllPost();
+	List<UserPostResponse> getAllPost();
 	
 	// getsinglePost
-	List<BlogPost> getPostById(Integer postId);
+	UserPostResponse getPostById(Integer postId);
 	
 	//get All post by category
-	List<BlogPost> getPostByCategory(Integer categoryId);
+	List<UserPostResponse> getPostByCategory(Integer categoryId);
 	
 	// getAllPostByUser
 	
-	List<BlogPost> getPostByUser(BlogUser blogUser);
+	List<UserPostResponse> getPostByUser(Integer userId);
 	
 	//searchPost
-	List<BlogPost> searchPost(String keyword);
+	List<UserPostResponse> searchPost(String keyword);
 	
 	
 }

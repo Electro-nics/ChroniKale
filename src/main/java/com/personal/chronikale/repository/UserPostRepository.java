@@ -12,5 +12,6 @@ import com.personal.chronikale.entity.BlogUser;
 public interface UserPostRepository extends JpaRepository<BlogPost, Integer>{
 	List<BlogPost> findByUser(BlogUser user);
 	List<BlogPost> findByCatagory(BlogCatagory catagory);
+	List<BlogPost> findByTitleContaining(String title);
 
 }

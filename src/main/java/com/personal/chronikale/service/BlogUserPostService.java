@@ -2,11 +2,14 @@ package com.personal.chronikale.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.personal.chronikale.Recorder.PostCreationRequest;
+import com.personal.chronikale.Recorder.UserPostResponse;
 import com.personal.chronikale.ServiceSAO.UserPostSAO;
 import com.personal.chronikale.entity.BlogCatagory;
 import com.personal.chronikale.entity.BlogPost;
@@ -44,7 +47,7 @@ public class BlogUserPostService implements UserPostSAO{
 				.orElseThrow(
 						()-> new ResourceNotFound(
 								"This catagoty is not found with id %s"
-								.formatted(userId)));
+								.formatted(CategoryId)));
 		
 		BlogPost blogPost= new BlogPost();
 		blogPost.setTitle(postCreationRequest.title());
@@ -77,38 +80,116 @@ public class BlogUserPostService implements UserPostSAO{
 
 	@Override
 	public void deletePost(Integer postId) {
-		// TODO Auto-generated method stub
+		BlogPost blogPost= this.postRepository.findById(postId)
+				.orElseThrow(
+						()-> new ResourceNotFound
+						(
+								"Post is not found with id %s".formatted(postId)
+								)
+						);
+		this.postRepository.deleteById(postId);
+
 		
 	}
 
 	@Override
-	public List<BlogPost> getAllPost() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserPostResponse> getAllPost() {
+		List<BlogPost> allUserPost = this.postRepository.findAll();
+		
+		return allUserPost.stream().map(p->
+		new UserPostResponse(
+				p.getTitle(),
+				p.getContent(),
+				p.getImageName(),
+				p.getAddedDate()
+				)
+		).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<BlogPost> getPostById(Integer postId) {
-		// TODO Auto-generated method stub
-		return null;
+	public UserPostResponse getPostById(Integer postId) {
+		BlogPost userPost = this.postRepository.findById(postId).orElseThrow(
+				()-> new ResourceNotFound(
+						"This Post is not found with id %s"
+						.formatted(postId))
+				);
+
+		
+		return new UserPostResponse(
+				userPost.getTitle(),
+				userPost.getContent(),
+				userPost.getImageName(),
+				userPost.getAddedDate()
+				);
+
+//		return userByPost.stream().map(p->
+//		new UserPostResponse(
+//				p.getTitle(),
+//				p.getContent(),
+//				p.getImageName(),
+//				p.getAddedDate()
+//				)
+//		).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<BlogPost> getPostByCategory(Integer categoryId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserPostResponse> getPostByCategory(Integer categoryId) {
+		BlogCatagory blogCatagory=this.catagoryRepository.findById(categoryId)
+				.orElseThrow(
+						()-> new ResourceNotFound(
+								"This catagoty is not found with id %s"
+								.formatted(categoryId)));
+		List<BlogPost> postByCatagory=this.postRepository.findByCatagory(blogCatagory);
+		
+		return postByCatagory.stream().map(p->
+		new UserPostResponse(
+				p.getTitle(),
+				p.getContent(),
+				p.getImageName(),
+				p.getAddedDate()
+				)
+		).collect(Collectors.toList());
+		
 	}
 
 	@Override
-	public List<BlogPost> getPostByUser(BlogUser blogUser) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserPostResponse> getPostByUser(Integer blogUser) {
+		BlogUser indivisualUser= this.userRepository.findById(blogUser)
+				.orElseThrow(
+						()-> new ResourceNotFound(
+								"User with id %s is not found"
+								.formatted(blogUser)
+								)
+						);
+		List<BlogPost> postByUser=this.postRepository.findByUser(indivisualUser);
+		
+		return postByUser.stream().map(p->
+		new UserPostResponse(
+				p.getTitle(),
+				p.getContent(),
+				p.getImageName(),
+				p.getAddedDate()
+				)
+		).collect(Collectors.toList());
+		
+
 	}
 
 	@Override
-	public List<BlogPost> searchPost(String keyword) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<UserPostResponse> searchPost(String keyword) {
+		List<BlogPost> searchedPost = this.postRepository.findByTitleContaining(keyword);
+		if (searchedPost.isEmpty()) {
+			throw  new ResourceNotFound("No Data found"); 
+		}
+		
+		return searchedPost.stream().map(s->
+		new UserPostResponse(
+				s.getTitle(),
+				s.getContent(),
+				s.getImageName(),
+				s.getAddedDate()
+				)
+		).collect(Collectors.toList());
 	}
 
 }
