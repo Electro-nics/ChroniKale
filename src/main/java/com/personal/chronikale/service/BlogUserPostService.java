@@ -2,13 +2,16 @@ package com.personal.chronikale.service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.personal.chronikale.Recorder.PostCreationRequest;
+import com.personal.chronikale.Recorder.PostResponse;
 import com.personal.chronikale.Recorder.UserPostResponse;
 import com.personal.chronikale.ServiceSAO.UserPostSAO;
 import com.personal.chronikale.entity.BlogCatagory;
@@ -28,13 +31,10 @@ public class BlogUserPostService implements UserPostSAO{
 	private UserRepository userRepository;
 
 	
-	
-	
-	
 
 	@Override
 	public PostCreationRequest createBlogPost(PostCreationRequest postCreationRequest,Integer CategoryId, Integer userId) {
-		// TODO Auto-generated method stub
+
 		
 		BlogUser blogUser= this.userRepository.findById(userId)
 				.orElseThrow(
@@ -93,10 +93,15 @@ public class BlogUserPostService implements UserPostSAO{
 	}
 
 	@Override
-	public List<UserPostResponse> getAllPost() {
-		List<BlogPost> allUserPost = this.postRepository.findAll();
+	public PostResponse getAllPost(Integer pageNumber, Integer pageSize) {
 		
-		return allUserPost.stream().map(p->
+		// Pagination Implementation 
+		
+		Pageable page= PageRequest.of(pageNumber, pageSize);
+		Page<BlogPost> pagePost=this.postRepository.findAll(page);
+		List<BlogPost> allUserPost =pagePost.getContent();
+		
+		List<UserPostResponse> allPost= allUserPost.stream().map(p->
 		new UserPostResponse(
 				p.getTitle(),
 				p.getContent(),
@@ -104,7 +109,21 @@ public class BlogUserPostService implements UserPostSAO{
 				p.getAddedDate()
 				)
 		).collect(Collectors.toList());
+		
+		
+		
+		return  new PostResponse(
+				allPost,
+				pagePost.getNumber(),
+				pagePost.getSize(),
+				pagePost.getTotalElements(),
+				pagePost.getTotalPages(),
+				pagePost.isLast()
+				);
+
+
 	}
+	
 
 	@Override
 	public UserPostResponse getPostById(Integer postId) {
@@ -121,27 +140,25 @@ public class BlogUserPostService implements UserPostSAO{
 				userPost.getImageName(),
 				userPost.getAddedDate()
 				);
-
-//		return userByPost.stream().map(p->
-//		new UserPostResponse(
-//				p.getTitle(),
-//				p.getContent(),
-//				p.getImageName(),
-//				p.getAddedDate()
-//				)
-//		).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<UserPostResponse> getPostByCategory(Integer categoryId) {
+	public PostResponse getPostByCategory(Integer categoryId,int pageNumber,int pageSize) {
+
+
+		
 		BlogCatagory blogCatagory=this.catagoryRepository.findById(categoryId)
 				.orElseThrow(
 						()-> new ResourceNotFound(
 								"This catagoty is not found with id %s"
 								.formatted(categoryId)));
-		List<BlogPost> postByCatagory=this.postRepository.findByCatagory(blogCatagory);
 		
-		return postByCatagory.stream().map(p->
+		Pageable page= PageRequest.of(pageNumber, pageSize);
+		Page<BlogPost> catagoryPost=(Page<BlogPost>) this.postRepository
+				.findByCatagory(blogCatagory, page);
+		List<BlogPost> postByCatagory=catagoryPost.getContent(); 
+		
+		List<UserPostResponse> catagoryResponses= postByCatagory.stream().map(p->
 		new UserPostResponse(
 				p.getTitle(),
 				p.getContent(),
@@ -149,11 +166,21 @@ public class BlogUserPostService implements UserPostSAO{
 				p.getAddedDate()
 				)
 		).collect(Collectors.toList());
+		return  new PostResponse(
+				catagoryResponses,
+				catagoryPost.getNumber(),
+				catagoryPost.getSize(),
+				catagoryPost.getTotalElements(),
+				catagoryPost.getTotalPages(),
+				catagoryPost.isLast()
+				);
 		
 	}
 
 	@Override
-	public List<UserPostResponse> getPostByUser(Integer blogUser) {
+	public PostResponse getPostByUser(Integer blogUser,int pageNumber,int pageSize) {
+
+		
 		BlogUser indivisualUser= this.userRepository.findById(blogUser)
 				.orElseThrow(
 						()-> new ResourceNotFound(
@@ -161,9 +188,12 @@ public class BlogUserPostService implements UserPostSAO{
 								.formatted(blogUser)
 								)
 						);
-		List<BlogPost> postByUser=this.postRepository.findByUser(indivisualUser);
 		
-		return postByUser.stream().map(p->
+		Pageable page= PageRequest.of(pageNumber, pageSize);
+		Page<BlogPost> userPost=this.postRepository.findByUser(indivisualUser, page);
+		List<BlogPost> postByUser=userPost.getContent();
+		
+		List<UserPostResponse> userPostResponse = postByUser.stream().map(p->
 		new UserPostResponse(
 				p.getTitle(),
 				p.getContent(),
@@ -171,6 +201,15 @@ public class BlogUserPostService implements UserPostSAO{
 				p.getAddedDate()
 				)
 		).collect(Collectors.toList());
+		return new PostResponse(
+				userPostResponse,
+				userPost.getNumber(),
+				userPost.getSize(),
+				userPost.getTotalElements(),
+				userPost.getTotalPages(),
+				userPost.isLast()
+				
+				);
 		
 
 	}

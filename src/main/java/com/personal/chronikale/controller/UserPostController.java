@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.personal.chronikale.Recorder.PostCreationRequest;
+import com.personal.chronikale.Recorder.PostResponse;
 import com.personal.chronikale.Recorder.UserPostResponse;
 import com.personal.chronikale.ServiceSAO.UserPostSAO;
 import com.personal.chronikale.responsePayload.ApplicationResponsePayload;
@@ -31,7 +32,9 @@ public class UserPostController {
 			@RequestParam Integer catagoryId,
 			@RequestParam Integer userId
 			){
-		PostCreationRequest savedDetails=userPostSAO.createBlogPost(creationRequest, catagoryId, userId);
+		PostCreationRequest savedDetails=userPostSAO.createBlogPost(
+				creationRequest, catagoryId, userId
+				);
 				return new ResponseEntity<>(savedDetails,HttpStatus.CREATED);
 	}
 	
@@ -52,8 +55,11 @@ public class UserPostController {
 		
 	}
 	@GetMapping("/allpost")
-	public ResponseEntity<List<UserPostResponse>> allUsersPost(){
-		List<UserPostResponse> allPost= userPostSAO.getAllPost();
+	public ResponseEntity<PostResponse> allUsersPost(
+			@RequestParam (value = "pageNumber",defaultValue = "0",required = false) Integer pageNumber,
+			@RequestParam (value = "pageSize",defaultValue = "10",required = false) Integer pageSize
+			){
+		PostResponse allPost= userPostSAO.getAllPost(pageNumber,pageSize);
 		return new ResponseEntity<>(allPost,HttpStatus.FOUND);
 		
 	}
@@ -67,17 +73,24 @@ public class UserPostController {
 	}
 	
 	@GetMapping("/postbycatagory")
-	public ResponseEntity<List<UserPostResponse>> postByCatagory(@RequestParam Integer catagoryId){
-		List<UserPostResponse> catagoryWisePost = userPostSAO.getPostByCategory(catagoryId);
+	public ResponseEntity<PostResponse> postByCatagory(@RequestParam Integer catagoryId,
+			@RequestParam (value = "pageNumber",defaultValue = "0",required = false) Integer pageNumber,
+			@RequestParam (value = "pageSize",defaultValue = "10",required = false) Integer pageSize
+			){
+		PostResponse catagoryWisePost = userPostSAO.getPostByCategory(catagoryId,pageNumber,pageSize);
 		return new ResponseEntity<>(catagoryWisePost,HttpStatus.FOUND);
 	}
 	@GetMapping("/postbyuser")
-	public ResponseEntity<List<UserPostResponse>> postByIndivisualUser(@RequestParam Integer userId){
-		List<UserPostResponse> postByUser= userPostSAO.getPostByUser(userId);
+	public ResponseEntity<PostResponse> postByIndivisualUser(@RequestParam Integer userId,
+			@RequestParam (value = "pageNumber",defaultValue = "0",required = false) Integer pageNumber,
+			@RequestParam (value = "pageSize",defaultValue = "10",required = false) Integer pageSize){
+		PostResponse postByUser= userPostSAO.getPostByUser(userId,pageNumber,pageSize);
 		return new ResponseEntity<>(postByUser,HttpStatus.FOUND);
 	}
 	@GetMapping("/searchedpost")
-	public ResponseEntity<List<UserPostResponse>> searchPost(@RequestParam String keyword){
+	public ResponseEntity<List<UserPostResponse>> searchPost(
+			@RequestParam String keyword
+			){
 		List<UserPostResponse> searchedPost= userPostSAO.searchPost(keyword);
 		return new ResponseEntity<>(searchedPost,HttpStatus.FOUND);
 	}
