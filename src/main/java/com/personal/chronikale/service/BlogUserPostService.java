@@ -1,27 +1,37 @@
 package com.personal.chronikale.service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.personal.chronikale.Recorder.PostCreationRequest;
+
 import com.personal.chronikale.Recorder.PostResponse;
 import com.personal.chronikale.Recorder.UserPostResponse;
+import com.personal.chronikale.Recorder.UserPostUpdateRequest;
+import com.personal.chronikale.ServiceSAO.FileService;
 import com.personal.chronikale.ServiceSAO.UserPostSAO;
 import com.personal.chronikale.entity.BlogCatagory;
 import com.personal.chronikale.entity.BlogPost;
 import com.personal.chronikale.entity.BlogUser;
+import com.personal.chronikale.exceptions.NoChangeException;
 import com.personal.chronikale.exceptions.ResourceNotFound;
 import com.personal.chronikale.repository.BlogCatagoryRepository;
 import com.personal.chronikale.repository.UserPostRepository;
 import com.personal.chronikale.repository.UserRepository;
 @Service
+@Transactional
 public class BlogUserPostService implements UserPostSAO{
 	@Autowired
 	private UserPostRepository postRepository;
@@ -29,13 +39,15 @@ public class BlogUserPostService implements UserPostSAO{
 	private BlogCatagoryRepository catagoryRepository;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private FileService fileService;
 
-	
+	@Value("${project.image}")
+	private String path;
 
 	@Override
-	public PostCreationRequest createBlogPost(PostCreationRequest postCreationRequest,Integer CategoryId, Integer userId) {
+	public PostCreationRequest createBlogPost(PostCreationRequest postCreationRequest,Integer CategoryId, Integer userId, MultipartFile file) throws IOException {
 
-		
 		BlogUser blogUser= this.userRepository.findById(userId)
 				.orElseThrow(
 						()-> new ResourceNotFound(
@@ -48,13 +60,17 @@ public class BlogUserPostService implements UserPostSAO{
 						()-> new ResourceNotFound(
 								"This catagoty is not found with id %s"
 								.formatted(CategoryId)));
+		String fileName="Default.png";
+		if(file!=null) {
+		fileName= this.fileService.uploadImage(path, file);
+		}
 		
 		BlogPost blogPost= new BlogPost();
 		blogPost.setTitle(postCreationRequest.title());
 		blogPost.setContent(postCreationRequest.content());
-		blogPost.setImageName(postCreationRequest.imageName() !=null
-				&& ! postCreationRequest.imageName().isEmpty()
-				? postCreationRequest.imageName(): "Default.png");
+		blogPost.setImageName(file !=null
+				
+				? fileName: "Default.png");
 		blogPost.setAddedDate(new Date());
 		blogPost.setUser(blogUser);
 		blogPost.setCatagory(blogCatagory);
@@ -73,9 +89,38 @@ public class BlogUserPostService implements UserPostSAO{
 	}
 
 	@Override
-	public BlogPost updateBlogPost(PostCreationRequest updateRequest, Integer postId) {
+	public UserPostUpdateRequest updateBlogPost(UserPostUpdateRequest updateRequest, Integer postId) {
+		BlogPost userPost = this.postRepository.findById(postId).orElseThrow(
+				()-> new ResourceNotFound("Post is not available")
+				);
+		boolean change=false;
+		// Update Post title
+		if(updateRequest.title()!=null && ! updateRequest.title().equals(userPost.getTitle())) {
+			userPost.setTitle(updateRequest.title());
+			change=true;
+		}
+		
+		// Update Image
+		if(updateRequest.imageName()!=null && ! updateRequest.imageName().equals(userPost.getImageName())) {
+			userPost.setImageName(updateRequest.imageName());
+			change=true;
+		}
+		
+		// UpdateContent
+		if(updateRequest.imageName()!=null && ! updateRequest.content().equals(userPost.getContent())) {
+			userPost.setContent(updateRequest.content());
+			change=true;
+		}
+		// Update Adder Date
+		if(change !=false) {
+			Date postUpdateDate = new Date();
+			userPost.setAddedDate(postUpdateDate);
+		}else {
+			throw  new NoChangeException("No Changes Made !!");
+		}
+		this.postRepository.save(userPost);
 		// TODO Auto-generated method stub
-		return null;
+		return updateRequest;
 	}
 
 	@Override
@@ -93,11 +138,20 @@ public class BlogUserPostService implements UserPostSAO{
 	}
 
 	@Override
-	public PostResponse getAllPost(Integer pageNumber, Integer pageSize) {
+	public PostResponse getAllPost(
+			Integer pageNumber,
+			Integer pageSize,
+			String sortBy,
+			String sortDirection
+			)
+	{
 		
-		// Pagination Implementation 
+		// Pagination and Sorting Implementation 
 		
-		Pageable page= PageRequest.of(pageNumber, pageSize);
+		Sort sort=sortDirection.equalsIgnoreCase("asc")
+				?Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
+
+		Pageable page= PageRequest.of(pageNumber, pageSize,sort);
 		Page<BlogPost> pagePost=this.postRepository.findAll(page);
 		List<BlogPost> allUserPost =pagePost.getContent();
 		
@@ -213,6 +267,7 @@ public class BlogUserPostService implements UserPostSAO{
 		
 
 	}
+	
 
 	@Override
 	public List<UserPostResponse> searchPost(String keyword) {
@@ -230,5 +285,7 @@ public class BlogUserPostService implements UserPostSAO{
 				)
 		).collect(Collectors.toList());
 	}
+
+
 
 }

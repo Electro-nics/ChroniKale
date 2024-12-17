@@ -1,22 +1,24 @@
 package com.personal.chronikale.ServiceSAO;
-
+import java.io.IOException;
 import java.util.List;
-
+import org.springframework.web.multipart.MultipartFile;
 import com.personal.chronikale.Recorder.PostCreationRequest;
 import com.personal.chronikale.Recorder.PostResponse;
 import com.personal.chronikale.Recorder.UserPostResponse;
-import com.personal.chronikale.entity.BlogPost;
+import com.personal.chronikale.Recorder.UserPostUpdateRequest;
+
 
 
 public interface UserPostSAO {
 	// Create Post
-	PostCreationRequest createBlogPost(PostCreationRequest blogPostCreationRequest, Integer CategoryId, Integer userId);
+	PostCreationRequest createBlogPost(PostCreationRequest blogPostCreationRequest, Integer CategoryId, Integer userId,MultipartFile file) throws IOException;
 	// Update Post
-	BlogPost updateBlogPost(PostCreationRequest updateRequest, Integer postId);
+	UserPostUpdateRequest updateBlogPost(UserPostUpdateRequest updateRequest, Integer postId);
 	// Delete Post
 	void deletePost(Integer postId);
+	
 	// get all post
-	PostResponse getAllPost(Integer pageNumber, Integer pageSize);
+	PostResponse getAllPost(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection );
 	
 	// getsinglePost
 	UserPostResponse getPostById(Integer postId);

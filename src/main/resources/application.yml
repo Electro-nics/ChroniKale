@@ -41,6 +41,14 @@ spring:
 #              - email
 #              - profile
 #            client-name: Google
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+project:
+  image: images/
+        
 
   main:
     web-application-type: servlet
