@@ -1,8 +1,10 @@
 package com.personal.chronikale.service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.personal.chronikale.Recorder.PostCreationRequest;
 
 import com.personal.chronikale.Recorder.PostResponse;
+import com.personal.chronikale.Recorder.UserCommentRecorder;
 import com.personal.chronikale.Recorder.UserPostResponse;
 import com.personal.chronikale.Recorder.UserPostUpdateRequest;
 import com.personal.chronikale.ServiceSAO.FileService;
@@ -25,9 +28,11 @@ import com.personal.chronikale.ServiceSAO.UserPostSAO;
 import com.personal.chronikale.entity.BlogCatagory;
 import com.personal.chronikale.entity.BlogPost;
 import com.personal.chronikale.entity.BlogUser;
+import com.personal.chronikale.entity.UserComment;
 import com.personal.chronikale.exceptions.NoChangeException;
 import com.personal.chronikale.exceptions.ResourceNotFound;
 import com.personal.chronikale.repository.BlogCatagoryRepository;
+import com.personal.chronikale.repository.CommentRepository;
 import com.personal.chronikale.repository.UserPostRepository;
 import com.personal.chronikale.repository.UserRepository;
 @Service
@@ -41,6 +46,8 @@ public class BlogUserPostService implements UserPostSAO{
 	private UserRepository userRepository;
 	@Autowired
 	private FileService fileService;
+	@Autowired
+	private CommentRepository commentRepository;
 
 	@Value("${project.image}")
 	private String path;
@@ -74,7 +81,9 @@ public class BlogUserPostService implements UserPostSAO{
 		blogPost.setAddedDate(new Date());
 		blogPost.setUser(blogUser);
 		blogPost.setCatagory(blogCatagory);
+//		blogPost.setComment();
 		BlogPost savedPost= this.postRepository.save(blogPost);
+		
 
 		
 		return new PostCreationRequest(
@@ -83,7 +92,8 @@ public class BlogUserPostService implements UserPostSAO{
 				savedPost.getImageName(),
 				savedPost.getAddedDate(),
 				savedPost.getCatagory(),
-				savedPost.getUser()
+				savedPost.getUser(),
+				null
 				);
 		
 	}
@@ -160,7 +170,14 @@ public class BlogUserPostService implements UserPostSAO{
 				p.getTitle(),
 				p.getContent(),
 				p.getImageName(),
-				p.getAddedDate()
+				p.getAddedDate(),
+				p.getComment() == null ? Collections.emptySet() : 
+		            p.getComment().stream()
+		                .map(comment -> new UserCommentRecorder(
+		                    comment.getId(),
+		                    comment.getContent()
+		                ))
+		                .collect(Collectors.toSet())
 				)
 		).collect(Collectors.toList());
 		
@@ -192,7 +209,14 @@ public class BlogUserPostService implements UserPostSAO{
 				userPost.getTitle(),
 				userPost.getContent(),
 				userPost.getImageName(),
-				userPost.getAddedDate()
+				userPost.getAddedDate(),
+				userPost.getComment() == null ? Collections.emptySet() : 
+					userPost.getComment().stream()
+		                .map(comment -> new UserCommentRecorder(
+		                    comment.getId(),
+		                    comment.getContent()
+		                ))
+		                .collect(Collectors.toSet())
 				);
 	}
 
@@ -208,7 +232,7 @@ public class BlogUserPostService implements UserPostSAO{
 								.formatted(categoryId)));
 		
 		Pageable page= PageRequest.of(pageNumber, pageSize);
-		Page<BlogPost> catagoryPost=(Page<BlogPost>) this.postRepository
+		Page<BlogPost> catagoryPost=this.postRepository
 				.findByCatagory(blogCatagory, page);
 		List<BlogPost> postByCatagory=catagoryPost.getContent(); 
 		
@@ -217,7 +241,14 @@ public class BlogUserPostService implements UserPostSAO{
 				p.getTitle(),
 				p.getContent(),
 				p.getImageName(),
-				p.getAddedDate()
+				p.getAddedDate(),
+				p.getComment() == null ? Collections.emptySet() : 
+		            p.getComment().stream()
+		                .map(comment -> new UserCommentRecorder(
+		                    comment.getId(),
+		                    comment.getContent()
+		                ))
+		                .collect(Collectors.toSet())
 				)
 		).collect(Collectors.toList());
 		return  new PostResponse(
@@ -252,7 +283,14 @@ public class BlogUserPostService implements UserPostSAO{
 				p.getTitle(),
 				p.getContent(),
 				p.getImageName(),
-				p.getAddedDate()
+				p.getAddedDate(),
+				p.getComment() == null ? Collections.emptySet() : 
+		            p.getComment().stream()
+		                .map(comment -> new UserCommentRecorder(
+		                    comment.getId(),
+		                    comment.getContent()
+		                ))
+		                .collect(Collectors.toSet())
 				)
 		).collect(Collectors.toList());
 		return new PostResponse(
@@ -281,7 +319,14 @@ public class BlogUserPostService implements UserPostSAO{
 				s.getTitle(),
 				s.getContent(),
 				s.getImageName(),
-				s.getAddedDate()
+				s.getAddedDate(),
+				s.getComment() == null ? Collections.emptySet() : 
+		            s.getComment().stream()
+		                .map(comment -> new UserCommentRecorder(
+		                    comment.getId(),
+		                    comment.getContent()
+		                ))
+		                .collect(Collectors.toSet())
 				)
 		).collect(Collectors.toList());
 	}

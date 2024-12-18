@@ -11,7 +11,7 @@ import com.personal.chronikale.Recorder.UserPostUpdateRequest;
 
 public interface UserPostSAO {
 	// Create Post
-	PostCreationRequest createBlogPost(PostCreationRequest blogPostCreationRequest, Integer CategoryId, Integer userId,MultipartFile file) throws IOException;
+	PostCreationRequest createBlogPost(PostCreationRequest blogPostCreationRequest, Integer CategoryId, Integer userId, MultipartFile file) throws IOException;
 	// Update Post
 	UserPostUpdateRequest updateBlogPost(UserPostUpdateRequest updateRequest, Integer postId);
 	// Delete Post

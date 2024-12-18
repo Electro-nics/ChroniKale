@@ -1,8 +1,11 @@
 package com.personal.chronikale.entity;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 @Entity
 @Table(name="BlogPost", schema = "public")
@@ -28,6 +32,10 @@ public class BlogPost {
 	private BlogCatagory catagory;
 	@ManyToOne
 	private BlogUser user;
+	
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+	private Set<UserComment>comment =new HashSet<>();
+	
 	public BlogPost(String title, String content, String imageName, Date addedDate) {
 		this.title = title;
 		this.content = content;
@@ -73,6 +81,15 @@ public class BlogPost {
 	}
 	public void setAddedDate(Date addedDate) {
 		this.addedDate = addedDate;
+	}
+	
+	
+	
+	public Set<UserComment> getComment() {
+		return comment;
+	}
+	public void setComment(Set<UserComment> comment) {
+		this.comment = comment;
 	}
 	@Override
 	public int hashCode() {
