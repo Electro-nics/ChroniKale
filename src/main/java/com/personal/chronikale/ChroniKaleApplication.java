@@ -16,7 +16,8 @@ import com.github.javafaker.Faker;
 import com.personal.chronikale.entity.BlogUser;
 import com.personal.chronikale.repository.UserRepository;
 
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@SpringBootApplication
+//(exclude = SecurityAutoConfiguration.class)
 
 public class ChroniKaleApplication {
 
@@ -25,11 +26,8 @@ public class ChroniKaleApplication {
 	}
 	
 
-	
-	@Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//	
+
 //	@Bean
 //	CommandLineRunner runner(UserRepository userRepository) {
 //		Faker fake= new Faker();

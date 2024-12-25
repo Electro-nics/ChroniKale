@@ -47,4 +47,14 @@ public class GlobalExpeptionHandler {
 		});
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
+	
+	
+	@ExceptionHandler(UserLoginExecption.class)
+	public ResponseEntity<ApplicationResponsePayload> userLoginExceptionHandler(UserLoginExecption ex){
+		String message= ex.getMessage();
+		ApplicationResponsePayload responsePayload=
+				new ApplicationResponsePayload(message, false);
+		return new ResponseEntity<>(responsePayload,HttpStatus.BAD_REQUEST);
+		
+	}
 }
