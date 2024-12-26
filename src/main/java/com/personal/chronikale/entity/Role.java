@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 @Table(name = "Role")
 public class Role {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String name;
 	public Integer getId() {

@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,7 +26,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 
 @Configuration
 @EnableWebSecurity
-
 public class SecurityConfig {
 
 	@Autowired
@@ -35,7 +35,7 @@ public class SecurityConfig {
 	@Autowired
     private JWTAuthenticationFilter authenticationFilter;
 
-    
+    public static final String[] PUBLIC_URL= {"/api/v1/auth/**","/v1/blog-user/user-registration"}; 
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,8 +47,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/login").permitAll()
+                .requestMatchers(PUBLIC_URL).permitAll()
                 .requestMatchers(HttpMethod.GET).permitAll()
+                .requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(authenticationEntryPoint))

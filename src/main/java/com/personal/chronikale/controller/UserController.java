@@ -60,7 +60,7 @@ public ResponseEntity<String> registerUser(@Valid
 		return new ResponseEntity<>("Register",HttpStatus.NOT_ACCEPTABLE);
 	}
 	String bloguserRegistration= blogUserService
-			.userRegistration(userRegistrationRequest);
+			.userRegistrationAdmin(userRegistrationRequest);
 	
 	
 	return new ResponseEntity<>(bloguserRegistration, HttpStatus.OK);

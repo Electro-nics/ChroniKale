@@ -1,7 +1,9 @@
 package com.personal.chronikale.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.catalina.mapper.Mapper;
@@ -16,16 +18,26 @@ import com.personal.chronikale.Recorder.RegistrationResponsePayload;
 import com.personal.chronikale.Recorder.UserRegistrationRequest;
 import com.personal.chronikale.Recorder.UserResponsePayload;
 import com.personal.chronikale.Recorder.UserUpdateRequest;
+import com.personal.chronikale.config.AppConstants;
 import com.personal.chronikale.entity.BlogUser;
+import com.personal.chronikale.entity.Role;
 import com.personal.chronikale.exceptions.DuplicateResourceException;
 import com.personal.chronikale.exceptions.RequestValidationExecption;
 import com.personal.chronikale.exceptions.ResourceNotFound;
+import com.personal.chronikale.repository.BlogUserRoleRepository;
+import com.personal.chronikale.repository.UserRepository;
 @Service
 public class BlogUserService {
 	@Autowired
 	private UserDAO userDAO;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private BlogUserRoleRepository blogUserRoleRepository;
+	@Autowired
+	private UserRepository userRepository;
+	
+	
 	public List<UserResponsePayload> getAllUserDetails(){
 		List<BlogUser> userDetails= userDAO.SelectAllUser();
 		return userDetails.stream().map(s -> new UserResponsePayload(s.getName(),
@@ -47,7 +59,7 @@ public class BlogUserService {
 		
 	}
 
-	public String userRegistration(UserRegistrationRequest registrationRequest) {
+	public String userRegistrationAdmin(UserRegistrationRequest registrationRequest) {
 		String email= registrationRequest.email();
 		String phoneNumber=registrationRequest.phoneNumber();
 		Boolean isDuplicateEmailPresent=userDAO.existsuserWithDUplicateEmail(email);
@@ -59,19 +71,67 @@ public class BlogUserService {
 			throw new DuplicateResourceException("Phone Number Already in User");
 		}
 		
+		Role adminUserRole= this.blogUserRoleRepository.findById(AppConstants.ADMIN_USER).get();
 		
-		BlogUser blogUser= new BlogUser(registrationRequest.name(),
-				registrationRequest.email(),
-				registrationRequest.phoneNumber(),
-				this.passwordEncoder.encode(registrationRequest.password()),
-				registrationRequest.about());
+		BlogUser blogUser= new BlogUser();
+				blogUser.setName(registrationRequest.name()); 
+				blogUser.setEmail(registrationRequest.email()); 
+				blogUser.setPhoneNumber(registrationRequest.phoneNumber()); 
+				blogUser.setPassword(
+						this.passwordEncoder.encode(
+								registrationRequest
+								.password()
+								)
+						); 
+				blogUser.setAbout(registrationRequest.about()); 
+				blogUser.setRoles(Set.of(adminUserRole));
+		
 		
 		Boolean isSaved=userDAO.insertUser(blogUser, registrationRequest.email());
 			if (isSaved) {
-				return "User registration SUccessfull";
+				return "Admin User registration Successfull";
 			}
 			
 			return "Something went wrong !! ";
+		
+	}
+	
+	
+	public UserResponsePayload normalUserRegistration(UserRegistrationRequest registrationRequest) {
+		String email= registrationRequest.email();
+		String phoneNumber=registrationRequest.phoneNumber();
+		Boolean isDuplicateEmailPresent=userDAO.existsuserWithDUplicateEmail(email);
+		Boolean isDuplicatePhonePresent=userDAO.existsuserWithDuplicatePhoneNumber(phoneNumber);
+		if (isDuplicateEmailPresent) {
+			throw new DuplicateResourceException("Email is already used !!");
+		}
+		if(isDuplicatePhonePresent) {
+			throw new DuplicateResourceException("Phone Number Already in User");
+		}
+		
+		Role userRole= this.blogUserRoleRepository.findById(AppConstants.NORMAL_USER).get();
+
+		
+		BlogUser blogUser= new BlogUser();
+		blogUser.setName(registrationRequest.name());
+		blogUser.setRoles(Set.of(userRole));
+		blogUser.setAbout(registrationRequest.about());
+		blogUser.setEmail(registrationRequest.email());
+		blogUser.setPassword(
+				this.passwordEncoder.encode(
+						registrationRequest.password()
+						)
+				);
+		blogUser.setPhoneNumber(registrationRequest.phoneNumber());
+		
+		BlogUser savedRequest= this.userRepository.save(blogUser);
+		
+		return new UserResponsePayload(
+				savedRequest.getName(),
+				savedRequest.getEmail(),
+				savedRequest.getPhoneNumber(),
+				savedRequest.getAbout()
+				);
 		
 	}
 	

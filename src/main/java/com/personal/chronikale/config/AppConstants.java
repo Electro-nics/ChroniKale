@@ -13,6 +13,9 @@ public class AppConstants {
 	public static final String SORT_BY="title";
 	public static final String SORT_DIRECTION="ASC";
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+	public static final Integer ADMIN_USER=101;
+	public static final Integer NORMAL_USER =102;
+	
 	
 	
 

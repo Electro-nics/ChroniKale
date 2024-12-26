@@ -1,5 +1,6 @@
 package com.personal.chronikale.controller;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +12,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.personal.chronikale.Recorder.JWTAuthRequest;
 import com.personal.chronikale.Recorder.JWTAuthResponse;
 import com.personal.chronikale.Recorder.RegistrationResponsePayload;
+import com.personal.chronikale.Recorder.UserRegistrationRequest;
+import com.personal.chronikale.Recorder.UserResponsePayload;
 import com.personal.chronikale.exceptions.UserLoginExecption;
 import com.personal.chronikale.security.JWTTokenHelper;
+import com.personal.chronikale.service.BlogUserService;
 
 @RestController
 @RequestMapping("/api/v1/auth/")
@@ -28,6 +33,8 @@ public class AuthController {
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	@Autowired
+	private BlogUserService blogUserService;
 
 	@PostMapping("/login")
 	
@@ -56,6 +63,15 @@ public class AuthController {
 			throw new UserLoginExecption("Username or Password is incorrect !!");
 			// TODO: handle exception
 		}
+		
+	}
+	@PostMapping("/registration")
+	public ResponseEntity<UserResponsePayload>
+	normalUserRegistration(@RequestBody UserRegistrationRequest registrationRequest){
+		
+		UserResponsePayload responsePayload= this.blogUserService
+				.normalUserRegistration(registrationRequest);
+		return  new ResponseEntity<>(responsePayload,HttpStatus.CREATED);
 		
 	}
 }
