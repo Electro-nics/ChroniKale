@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -34,11 +34,13 @@ import com.personal.chronikale.ServiceSAO.UserPostSAO;
 import com.personal.chronikale.config.AppConstants;
 import com.personal.chronikale.responsePayload.ApplicationResponsePayload;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @CrossOrigin
 @RequestMapping("v1/userblog/post")
+@SecurityRequirement(name = "bearerScheme")
 public class UserPostController {
 	
 	
@@ -54,6 +56,9 @@ public class UserPostController {
 	@Autowired
 	private ObjectMapper mapper;
 	
+	
+	
+	@SecurityRequirement(name = "BearerAuth")
 	@PostMapping( "/create-post")
 	public ResponseEntity<PostCreationRequest> userPostCreation(
 			@RequestPart("creationRequest") String creationRequest,
@@ -69,7 +74,7 @@ public class UserPostController {
 	}
 	
 	
-	
+	@SecurityRequirement(name = "BearerAuth")
 	@DeleteMapping("/delete-post")
 	public ResponseEntity<ApplicationResponsePayload> deletePost(
 			@RequestParam Integer postId
@@ -88,7 +93,7 @@ public class UserPostController {
 	}
 	
 	
-	
+	@SecurityRequirement(name = "BearerAuth")
 	@GetMapping("/allpost")
 	public ResponseEntity<PostResponse> allUsersPost(
 			@RequestParam (value = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
@@ -100,6 +105,8 @@ public class UserPostController {
 		return new ResponseEntity<>(allPost,HttpStatus.FOUND);
 		
 	}
+	
+	
 	@GetMapping("/indivisual-post")
 	public ResponseEntity<UserPostResponse> indivisualPost(
 			@RequestParam Integer postId
@@ -139,9 +146,9 @@ public class UserPostController {
 	}
 	
 	
-	
-	@PostMapping("/user-post/image/upload")
-	public ResponseEntity<ApplicationResponsePayload> uploadPostImage(@RequestParam Integer postId,
+	@PostMapping(value =  "/user-post/image/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ApplicationResponsePayload> uploadPostImage(
+			@RequestParam Integer postId,
 			@RequestParam("imageFile") MultipartFile imageFile
 			) throws IOException{
 		

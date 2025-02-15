@@ -20,21 +20,26 @@ import com.personal.chronikale.Recorder.BlogCatagoryUpdateRequest;
 import com.personal.chronikale.responsePayload.ApplicationResponsePayload;
 import com.personal.chronikale.service.BlogCatagoryService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin
 @RequestMapping("v1/Blog-Catagory")
-
+@SecurityRequirement(name = "bearerScheme")
 public class BlogCatagoryController {
 	
 @Autowired
 private BlogCatagoryService blogCatagoryService;
+
+
 @GetMapping("/all-blog-Catagory")
 public ResponseEntity<List<BlogCatagoryResponsePayload>>AllavaibleCatagories(){
 	List<BlogCatagoryResponsePayload> catagoryResponse = blogCatagoryService.getAllBlogCatagory();
 	return new ResponseEntity<>(catagoryResponse,HttpStatus.OK);
 }
+
+
 
 @GetMapping("/individual-cataory")
 public ResponseEntity<BlogCatagoryResponsePayload> indivisualBlogCatagoryById(
@@ -60,6 +65,10 @@ public ResponseEntity<ApplicationResponsePayload> createNewBlogCatagory(
 						), HttpStatus.OK);
 	
 }
+
+
+
+
 @PutMapping("/catagory-update")
 public ResponseEntity<ApplicationResponsePayload> updateRequest(
 		@Valid

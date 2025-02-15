@@ -23,11 +23,13 @@ import com.personal.chronikale.Recorder.UserUpdateRequest;
 import com.personal.chronikale.responsePayload.ApplicationResponsePayload;
 import com.personal.chronikale.service.BlogUserService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/v1/blog-user")
+@SecurityRequirement(name = "bearerScheme")
 public class UserController {
 	
 @Autowired
@@ -50,6 +52,8 @@ public ResponseEntity<UserResponsePayload> userDetailsById(
 	
 }
 
+
+@SecurityRequirement(name = "BearerAuth")
 @PostMapping("/user-registration")
 public ResponseEntity<String> registerUser(@Valid
 		@RequestBody UserRegistrationRequest userRegistrationRequest,
@@ -66,6 +70,9 @@ public ResponseEntity<String> registerUser(@Valid
 	return new ResponseEntity<>(bloguserRegistration, HttpStatus.OK);
 	
 }
+
+
+@SecurityRequirement(name = "BearerAuth")
 @PutMapping("/user-update")
 public ResponseEntity<ApplicationResponsePayload> updateRequest(
 		@Valid
@@ -83,6 +90,8 @@ public ResponseEntity<ApplicationResponsePayload> updateRequest(
 	
 }
 
+
+@SecurityRequirement(name = "BearerAuth")
 @DeleteMapping("/delete-user")
 public ResponseEntity<ApplicationResponsePayload> deleteBlogUser(
 		@RequestParam Integer userId

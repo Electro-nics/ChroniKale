@@ -15,14 +15,20 @@ import com.personal.chronikale.Recorder.UserCommentRecorder;
 import com.personal.chronikale.ServiceSAO.CommentSAO;
 import com.personal.chronikale.responsePayload.ApplicationResponsePayload;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @CrossOrigin
 @RequestMapping("v1/user-comment")
+@SecurityRequirement(name = "bearerScheme")
 public class UserCommentController {
 	
 	@Autowired
 	private CommentSAO commentSAO;
 	
+	
+	
+	@SecurityRequirement(name = "BearerAuth")
 	@PostMapping("/create-comment")
 	public ResponseEntity<UserCommentRecorder> userCommentCreator(
 			@RequestBody UserCommentRecorder commentRecorder,
@@ -35,6 +41,8 @@ public class UserCommentController {
 		
 	}
 	
+	
+	@SecurityRequirement(name = "BearerAuth")
 	@DeleteMapping("/delete-user-comment")
 	public ResponseEntity<ApplicationResponsePayload> deleteUserComment(
 			@RequestParam Integer customerId

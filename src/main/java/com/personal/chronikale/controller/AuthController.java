@@ -24,8 +24,13 @@ import com.personal.chronikale.exceptions.UserLoginExecption;
 import com.personal.chronikale.security.JWTTokenHelper;
 import com.personal.chronikale.service.BlogUserService;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
 @RestController
 @RequestMapping("/api/v1/auth/")
+
+//@OpenAPIDefinition(info = @Info(title ="API Documentation", version = "1.0"))
 public class AuthController {
 	@Autowired
 	private JWTTokenHelper jwtTokenHelper;

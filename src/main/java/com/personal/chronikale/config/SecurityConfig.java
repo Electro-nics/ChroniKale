@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.personal.chronikale.security.CustomUserDetailService;
 import com.personal.chronikale.security.JWTAuthenticationEntryPoint;
@@ -26,6 +27,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 
 @Configuration
 @EnableWebSecurity
+@EnableWebMvc
 public class SecurityConfig {
 
 	@Autowired
@@ -35,7 +37,26 @@ public class SecurityConfig {
 	@Autowired
     private JWTAuthenticationFilter authenticationFilter;
 
-    public static final String[] PUBLIC_URL= {"/api/v1/auth/**","/v1/blog-user/user-registration"}; 
+    public static final String[] PUBLIC_URL= {
+    		"/api/v1/auth/**",
+    		"/v1/blog-user/user-registration",
+    		"/v3/api-docs",
+    		"/v2/api-docs",
+    		"/swagger-resource",
+    		"/swagger-ui",
+    		"/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/api/public/**",
+            "/api/public/authenticate",
+            "/actuator/*",
+            "/swagger-ui/**"
+    		
+    		}; 
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5431/blogapplication?currentSchema=public
+    username: goutam
+    password: password
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
